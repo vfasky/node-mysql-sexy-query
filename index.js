@@ -1,1 +1,1 @@
-module.exports = require('./db.js');
+module.exports = require('./mysql');

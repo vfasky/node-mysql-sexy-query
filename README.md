@@ -121,7 +121,7 @@ mysql-sex-query 有几个特点：
                      .delete(function(affectedRows){
                         if( affectedRows == 0 ) console.log( '没以数据被删除' );
                         console.log( '删除成功' );
-                     })l
+                     });
 
 
     //提交查询

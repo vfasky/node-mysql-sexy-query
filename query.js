@@ -1,28 +1,8 @@
-var mysql = require('mysql');
-//Enable mysql-queues
-var queues = require('mysql-queues');
+/**
+ * sql 构造器
+ * @author vfasky@gmail.com
+ */
 
-var core = require('./base');
-
-//存放连接
-var mysqlClient = false , client;
-
-var debug = false;
-
-//创建连接
-exports.createClient = function(cfg){
-	//if (false !== mysqlClient ) return mysqlClient;
-	console.log('create mysql Client');
-	client = mysql.createClient(cfg);
-
-	debug = cfg.debug ? true : false;
-
-	queues(client, debug);
-
-	mysqlClient = client.createQueue();
-
-	return mysqlClient;
-};
 
 /**
  * 构造查询
@@ -30,7 +10,7 @@ exports.createClient = function(cfg){
  * @param  {undefined} undef undefined
  * @return {Object}      
  */
-exports.query = function( table , undef ){
+exports = module.exports = function( table , undef ){
 	var _select = '*';
 	var _from   = table;
 	var _where  = [];
@@ -44,8 +24,6 @@ exports.query = function( table , undef ){
 	var _action = 'SELECT';
 
 
-
-    
 	/**
 	 * 参数
 	 * @type {Object}
@@ -77,11 +55,13 @@ exports.query = function( table , undef ){
 	                  'GROUP' , 'ORDER' , 'BY' ,
 	                  'COUNT' , '*' , '?'];
 
-	/**
-	 * 元数据绑定
-	 * @type {Boolean}
-	 */
-	this.meta = false;
+	this.getPage = function(){
+		return _page;
+	};  
+
+	this.getPageSize = function(){
+		return _pageSize;
+	};                 
 
 	/**
 	 * 转义字段
@@ -90,9 +70,9 @@ exports.query = function( table , undef ){
 	 */
 	this.filterColumn = function(field){
 		
-		field = core.trim(field);
+		field = _self.trim(field);
 	
-		if( false == core.inArray( field.toUpperCase(), _condition ) )
+		if( false == _self.inArray( field.toUpperCase(), _condition ) )
 		{
 			var temp  = field.split(' ');
 			var count = temp.length
@@ -126,7 +106,124 @@ exports.query = function( table , undef ){
 
 		}
 		return field;
+	};
+
+	this.isFunction = function (x) {
+	      switch(typeof x) {
+	      	case "function" : return true ;
+	        case "object"   :
+	          if ( "function" !== typeof x.toString )
+	               return (x + "").match(/function/) !== null ;
+	          else
+	               return Object.prototype.toString.call(x) === "[object Function]" ;
+	          break ;
+	        default  : return false ;
+	      }
 	}
+
+	this.inArray = function(item , array){
+		for( k in array )
+		{
+			if( item == array[k] )
+			{
+				return true;
+			}
+		}
+		return false;
+	};
+
+	/**
+	 * escape
+	 * @param  {String|Array} val 要过滤的值
+	 * @return {String}     过滤后的值
+	 */
+	this.escape = function(val) {
+	  var escape = this.escape;
+
+	  if (val === undefined || val === null) {
+	    return 'NULL';
+	  }
+
+	  switch (typeof val) {
+	    case 'boolean': return (val) ? 'true' : 'false';
+	    case 'number': return val+'';
+	  }
+
+	  if (Array.isArray(val)) {
+	    var sanitized = val.map( function( v ) { return escape( v ); } );
+	    return "'" + sanitized.join( "','" ) + "'";
+	  }
+
+	  if (typeof val === 'object') {
+	    val = (typeof val.toISOString === 'function')
+	      ? val.toISOString()
+	      : val.toString();
+	  }
+
+	  val = val.replace(/[\0\n\r\b\t\\\'\"\x1a]/g, function(s) {
+	    switch(s) {
+	      case "\0": return "\\0";
+	      case "\n": return "\\n";
+	      case "\r": return "\\r";
+	      case "\b": return "\\b";
+	      case "\t": return "\\t";
+	      case "\x1a": return "\\Z";
+	      default: return "\\"+s;
+	    }
+	  });
+	  return "'"+val+"'";
+	};
+
+	/**
+	 * 格式化 sql
+	 * @param  {String} sql    
+	 * @param  {Array} params 参数
+	 * @return {String}        格式化后的sql
+	 */
+	this.format = function(sql, params) {
+	  var escape = this.escape;
+	  //console.log( params ) 
+	  params = params.concat();
+
+	  sql = sql.replace(/\?/g, function(k) {
+	    if (params.length == 0) {
+	      throw new Error('too few parameters given');
+	    }
+	    return escape(params.shift());
+	  });
+
+	  if (params.length) {
+	    throw new Error('too many parameters given');
+	  }
+
+	  return sql;
+	};
+
+	/**
+	 * each 数组
+	 * @param  {Array}   array   
+	 * @param  {Function} callback [description]
+	 */
+	this.each = function( array , callback ){
+		if( undef == callback ) return false;
+		//if( false == Array.isArray(array) ) return false;
+		for( k in array )
+		{
+			callback( array[k] , k );
+		}
+	};
+
+	/**
+	 * 去空两边空格
+	 * @param  {String} str [description]
+	 * @return {String}     [description]
+	 */
+	this.trim = function(str)
+	{
+		if (typeof str === 'string') {
+			return str.replace(/(^\s*)|(\s*$)/g, "");
+		} 
+	};
 
 	/**
 	 * join 查询
@@ -134,9 +231,9 @@ exports.query = function( table , undef ){
 	 * @return {this}     
 	 */
 	this.join = function( join ){
-		join = core.trim(join).split(' ');
+		join = _self.trim(join).split(' ');
 		var temp = [];
-		core.each(join , function(v){
+		_self.each(join , function(v){
 			temp[ temp.length ] = _self.filterColumn( v );
 		});
 		_join[ _join.length ] = 'INNER JOIN ' + temp.join(' ') + ' ';
@@ -149,9 +246,9 @@ exports.query = function( table , undef ){
 	 * @return {this}     
 	 */
 	this.leftJoin = function( join ){
-		join = core.trim(join).split(' ');
+		join = _self.trim(join).split(' ');
 		var temp = [];
-		core.each(join , function(v){
+		_self.each(join , function(v){
 			temp[ temp.length ] = _self.filterColumn( v );
 		});
 		_join[ _join.length ] = 'LEFT JOIN ' + temp.join(' ') + ' ';
@@ -164,9 +261,9 @@ exports.query = function( table , undef ){
 	 * @return {this}     
 	 */
 	this.rightJoin = function( join ){
-		join = core.trim(join).split(' ');
+		join = _self.trim(join).split(' ');
 		var temp = [];
-		core.each(join , function(v){
+		_self.each(join , function(v){
 			temp[ temp.length ] = _self.filterColumn( v );
 		});
 		_join[ _join.length ] = 'RIGHT JOIN ' + temp.join(' ') + ' ';
@@ -179,7 +276,7 @@ exports.query = function( table , undef ){
 		_action = 'SELECT';
 		fields  = fields.split(',');
 		var select = [];
-		core.each(fields , function(field){
+		_self.each(fields , function(field){
 			select[ select.length ] = _self.filterColumn(field);
 		});
 
@@ -191,82 +288,48 @@ exports.query = function( table , undef ){
 	};
 
 	//添加
-	this.add = function(attr , callback){
+	this.add = function(attr){
 		_action = 'INSERT';
 
 		for(k in attr)
 		{
-			_attr[ _attr.length ] = _self.filterColumn(k);
 			_param.attr[ _param.attr.length ] = attr[k];
+			_attr[ _attr.length ] = _self.filterColumn(k);
+			
 		}
 
-		var sql = this.sql();
-		//console.log( sql );
-		mysqlClient.query( sql , function selectCb(err, results, fields) {
-		    if (err) {
-		      throw err;
-		    }
-		    if( core.isFunction(callback) )
-		    {
-		    	callback( results.insertId , results)
-		    }
-		    //console.log(results);
-		    
-		});
-		return _self;
+		return this.sql();
+		
 	};
 
 	//删除
-	this.delete = function(callback){
+	this.delete = function(){
 		_action = 'DELETE';
-		var sql = this.sql();
-		console.log( sql );
-		mysqlClient.query( sql , function selectCb(err, results, fields) {
-		    if (err) {
-		      throw err;
-		    }
-		    if( core.isFunction(callback) )
-		    {
-		    	callback( results.affectedRows , results)
-		    }
-		    //console.log(results);
-		    
-		});
-		return _self;
+		return this.sql();
 	}
 
 	//保存
-	this.save = function(attr , callback){
+	this.save = function(attr){
 		_action = 'UPDATE';
 
 		for(k in attr)
 		{
+			_param.attr[ _param.attr.length ] = attr[k];
 			_attr[ _attr.length ] = _self.filterColumn(k);
-			_param.attr[_param.attr.length ] = attr[k];
+			
 		}
-
-		var sql = this.sql();
-		//console.log( sql );
-		mysqlClient.query( sql , function selectCb(err, results, fields) {
-		    if (err) {
-		      throw err;
-		    }
-		    if( core.isFunction(callback) )
-		    {
-		    	callback( results.affectedRows , results)
-		    }
-		    //console.log(results);
-		    
-		});
-		return _self;
+		//console.log( _attr );
+		//console.log( _param.attr );
+		return this.sql();
 	};
 
 	this.where = function(condition){
-		condition  = core.trim( condition );
+		
+		condition  = _self.trim( condition );
 		conditions = condition.split(' ');
 		var where = ''
 
-		core.each( conditions , function( v , k ){
+		_self.each( conditions , function( v , k ){
 			where += ' ' + _self.filterColumn( v ) + ' '
 		} );
 
@@ -274,23 +337,26 @@ exports.query = function( table , undef ){
 
 		_where[ _where.length ] = where;
 
-		core.each( arguments , function( v , k ){
+		//console.log( arguments );
+		_self.each( arguments , function( v , k ){
+			//console.log( k );
+			//console.log( v );
 			if( k > 0 )
 			{
 				_param.where[ _param.where.length ] = v;
 			}
 		} );
 
-		//console.log( _where );
+		
 		return _self;
 	};
 
 	this.orWhere = function(condition){
-		condition  = core.trim( condition );
+		condition  = _self.trim( condition );
 		conditions = condition.split(' ');
 		var where = '';
 
-		core.each( conditions , function( v , k ){
+		_self.each( conditions , function( v , k ){
 			where += ' ' + _self.filterColumn( v ) + ' '
 		} );
 
@@ -298,7 +364,7 @@ exports.query = function( table , undef ){
 
 		_where[ _where.length ] = where;
 
-		core.each( arguments , function( v , k ){
+		_self.each( arguments , function( v , k ){
 			if( k > 0 )
 			{
 				_param.where[ _param.where.length ] = v;
@@ -313,14 +379,15 @@ exports.query = function( table , undef ){
 		_page     = page ? Number(page) : 1;
 		_pageSize = pageSize ? Number(pageSize) : 10;
 	
-		this.limit(  _pageSize , ( _page - 1 ) * _pageSize )
+		_self.limit(  _pageSize , ( _page - 1 ) * _pageSize )
 		return _self;
 	}
 
 	this.group = function(group){
-		groups = core.trim(group).split(',');
+
+		groups = _self.trim(group).split(',');
 		var temp = [];
-		core.each(groups , function(v){
+		_self.each(groups , function(v){
 			temp[ temp.length ] = _self.filterColumn(v);
 		});
 
@@ -329,10 +396,10 @@ exports.query = function( table , undef ){
 	};
 
 	this.order = function(order){
-		orders = core.trim(order).split(',');
+		orders = _self.trim(order).split(',');
 		var temp = []
-		core.each( orders , function(v){
-			var temp2 = core.trim(v).split(' ');
+		_self.each( orders , function(v){
+			var temp2 = _self.trim(v).split(' ');
 			temp2[0] = _self.filterColumn( temp2[0] );
 			if( temp2.length == 1 )
 			{
@@ -354,7 +421,7 @@ exports.query = function( table , undef ){
 
 	this.countSql = function(){
 		var sql = 'SELECT COUNT(*) as `row_count` FROM ' + _self.filterColumn( _from );
-		core.each( _join , function(v){
+		_self.each( _join , function(v){
 			sql += ' ' + v;
 		});
 
@@ -366,126 +433,8 @@ exports.query = function( table , undef ){
 		{
 			sql += ' GROUP BY ' + _group + ' ';
 		}
+		return _self.format(sql , _param.where);
 
-	
-
-		if( debug == true )
-		{
-			console.log( client.format(sql , _param.where) );
-		}
-
-		return client.format(sql , _param.where);
-
-	};
-
-	this.count = function( callback ) {
-		callback = callback || function () {};
-
-		mysqlClient.query( this.countSql() , function selectCb(err, results, fields) {
-		    if (err) {
-		      throw err;
-		    }
-		
-		    callback( Number(results[0].row_count) );
-		    // console.log(results);
-		    // console.log(fields);
-		});
-
-		return _self;
-	};
-
-	this.get = function() {
-		var callback = arguments[ arguments.length - 1 ] || function () {};
-		var number   = core.isFunction( arguments[0] ) ? 1 : Number(arguments[0]);
-
-		this.limit(number);
-
-		var sql = this.sql();
-
-		//console.log( sql );
-
-		mysqlClient.query( sql , function selectCb(err, results, fields) {
-		    if (err) {
-		      throw err;
-		    }
-		    //console.log( _self.meta );
-		    if( number == 1 )
-		    {		    	
-		    	if( results[0] )
-		    	{
-		    		var data = results[0];
-		    		if( false != _self.meta )
-		    		{
-		    			data = new _self.meta(data);
-		    		}
-		    	}
-		    	else
-		    	{
-		    		var data = false
-		    	}
-
-		    	return callback( data );
-		    }
-			
-			if( false != _self.meta )
-		    {
-		    	var data = [];
-		    	core.each( results , function( v , k){
-		    		data[k] = new _self.meta(v);
-		    	});
-		    	return callback( data );
-		    }	
-		    callback( results );
-		    // console.log(results);
-		    // console.log(fields);
-		});
-
-		return _self;
-	};
-
-	this.query = function( callback ){
-		var sql = this.sql();
-		mysqlClient.query( sql , function selectCb(err, results, fields) {
-		    if (err) {
-		      throw err;
-		    }
-		    // console.log( sql );
-		    // console.log( results );
-		    
-		    if( false != _self.meta )
-		    {
-		    	var data = [];
-		    	core.each( results , function( v , k){
-		    		data[k] = new _self.meta(v);
-		    	});
-		    	results = data;
-		    }
-
-		    if( _page == undef ) return callback( results );
-
-		    //计算分页信息
-		    _self.count( function(count){
-		    	var countPage = Math.ceil( count / _pageSize );
-			    var prev = _page <= 1 ? 1 : _page - 1;
-	            var next = _page < countPage ? _page + 1 : countPage;
-
-	            callback( results , {
-	            	count : count ,
-	            	countPage : countPage ,
-	            	prev : prev ,
-	            	current : _page ,
-	            	next : next ,
-	            	pageSize : _pageSize
-	            } );
-		    } );
-		    
-		    
-		});
-		return _self;
-	}
-
-	this.execute = function(){
-		mysqlClient.execute();
 	};
 
 	this.sql = function(){
@@ -493,7 +442,7 @@ exports.query = function( table , undef ){
 		switch(_action){
 			case 'SELECT':
 				sql = 'SELECT ' + _select + ' FROM ' + _self.filterColumn( _from );
-				core.each( _join , function(v){
+				_self.each( _join , function(v){
 					sql += ' ' + v;
 				});
 
@@ -516,7 +465,7 @@ exports.query = function( table , undef ){
 				sql += _attr.join(',') + ') VALUES (';
 
 				placeholder = [];
-				core.each( _attr , function(){
+				_self.each( _attr , function(){
 					placeholder[ placeholder.length ] = '?';
 				} );
 
@@ -528,7 +477,7 @@ exports.query = function( table , undef ){
 				sql = 'UPDATE ' + _self.filterColumn( _from ) + ' SET ';
 
 				var columns = [];
-				core.each( _attr , function(v){
+				_self.each( _attr , function(v){
 					columns[ columns.length ] = v + ' = ?';
 				} );
 				sql += columns.join(',')
@@ -547,29 +496,14 @@ exports.query = function( table , undef ){
 
 		}
 		var param = [];
-		core.each( _param.attr , function(v){
+		_self.each( _param.attr , function(v){
 			param[ param.length ] = v;
 		} );
-		core.each( _param.where , function(v){
+		_self.each( _param.where , function(v){
 			param[ param.length ] = v;
 		} );
 
+		return _self.format(sql , param);
 	
-		if( debug == true )
-		{
-			console.log( client.format(sql , _param.where) );
-		}
-
-		return client.format(sql , param);
-		//console.log( _param );
-		//return sql;
 	}
 };
-
-exports.execute = function(){
-	mysqlClient.execute();
-};
-
-exports.use = function(table){
-	return new exports.query(table);
-}

@@ -28,8 +28,8 @@
     "node": "*"
   },
   "dependencies": {
-    "mysql": ">=0.9.5" ,
-    "mysql-queues": ">= 0.3.4"
+    "mysql": ">=0.9.5"
+    ,"mysql-pool": ">= 0.2.2"
   },
   "_engineSupported": true,
   "_npmVersion": "1.1.16",
