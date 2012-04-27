@@ -20,7 +20,7 @@
     "type": "git",
     "url": "git://github.com/vfasky/mysql-sex-query.git"
   },
-  "main": "db.js",
+  "main": "mysql.js",
   "version": "0.0.1",
   "_id": "mysql-sex-query@0.0.1",
   "optionalDependencies": {},

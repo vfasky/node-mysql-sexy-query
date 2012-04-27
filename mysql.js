@@ -158,7 +158,7 @@ exports.query = function( table ){
 		    if( false != _self.meta )
 		    {
 		    	var data = [];
-		    	core.each( results , function( v , k){
+		    	_query.each( results , function( v , k){
 		    		data[k] = new _self.meta(v);
 		    	});
 		    	results = data;
