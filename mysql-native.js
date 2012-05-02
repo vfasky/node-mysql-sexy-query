@@ -1,6 +1,6 @@
 //引进 sql 构造器
 var query = require('./query.js');
-var mysql = require("mysql-native");
+var mysql = require('mysql-native');
 var cfg   = {};
 
 //创建连接
@@ -15,7 +15,9 @@ var createClient = function(){
 		default :
 			var db = mysql.createTCPClient( cfg.host , cfg.port );	
 	}
-	db.auto_prepare = true;
+	
+	db.set('auto_prepare' , false);
+	db.set('charset' , 'utf8_general_cs');
 	db.auth( cfg.database , cfg.user, cfg.password);
 	return db;
 }
@@ -54,8 +56,11 @@ exports.query = function( table ){
 
 		var db = createClient();
 		var ret = false;
+		db.query("SET NAMES 'utf8'");
 		db.query( _query.sql() ).addListener('row', function(result) {
-			return ret = result;
+			if( number == 1 ) return ret = result;
+			if( false == ret ) ret = [];
+			ret[ret.length] = result;
 	    }).addListener('end', function() {
 	    	db.close();
 	    	return callback( ret );

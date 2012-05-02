@@ -56,6 +56,7 @@ exports.query = function( table ){
 	this.save = function( attr , callback ){
 		var sql = _query.save( attr );
 		//console.log( sql );
+
 		
 		pool.query( sql , function selectCb(err, results, fields) {
 		    if (err) {
