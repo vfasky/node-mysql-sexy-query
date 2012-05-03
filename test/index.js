@@ -2,32 +2,50 @@
 
 
 var mysql = require('../mysql-native');
+
 mysql.createClient({
 	user: 'root',
     password: '123456',
     database: '0750hs.net' 
 });
-var db = new mysql.query('degree').get(5 , function(row){
-	console.log( row );
-})
 
-// db.where('id = ?' , 1).save({ name : '小学' } , function(row){
+// //查询1条
+// mysql.use('degree').get( function(row){
 // 	console.log( row );
-// })
+// });
+// //查询5条
+// mysql.use('degree').get(5 , function(rows){
+// 	console.log( rows );
+// });
+// //统计
+// mysql.use('degree').count(function(count){
+// 	console.log( count );
+// });
+// //分页查询
+// mysql.use('degree').page(1 , 2).query(function(rows , pageInfo){
+// 	console.log( rows );
+// 	console.log( pageInfo );
+	
+// }); 
+// 
 
-// db.add({ name : 'test' } , function(row){
-// 	console.log( row );
-// })
-
-// db.where('id = ?' , 7).delete(function(ret){
-// 	console.log( ret ) ;
+// //添加
+// mysql.use('degree').save({name : '中文测试'} , function(id ,ret){
+// 	console.log( id );
+// 	console.log( ret );
+// 	
 // });
 
-// db.count(function(ret){
-// 	console.log( ret ) ;
+// //编辑
+// mysql.use('degree').where('id = ?' , 7 ).save({name : '中文测试'} , function(affectedRows ,ret){
+// 	console.log( affectedRows );
+// 	console.log( ret );
+
 // });
 
-// db.page(1 , 2).query(function(ret , pageInfo){
-// 	console.log( ret ) ;
-// 	console.log( pageInfo ) ;
-// });
+
+//删除
+mysql.use('degree').where('id = ?' , 7 ).or('id = ?' ,8).delete(function(affectedRows){
+	console.log( affectedRows );
+	mysql.close();
+});

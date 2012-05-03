@@ -1,7 +1,7 @@
 {
-  "name": "mysql-sex-query",
+  "name": "mysql-sexy-query",
   "description": "友好的 mysql 查询",
-  "homepage": "https://github.com/vfasky/mysql-sex-query",
+  "homepage": "https://github.com/vfasky/node-mysql-sexy-query",
   "keywords": [
     "mysql",
     "sex-sql"
@@ -18,18 +18,17 @@
  
   "repository": {
     "type": "git",
-    "url": "git://github.com/vfasky/mysql-sex-query.git"
+    "url": "git@github.com:vfasky/node-mysql-sexy-query.git"
   },
-  "main": "mysql.js",
-  "version": "0.0.1",
-  "_id": "mysql-sex-query@0.0.1",
+  "main": "mysql-native.js",
+  "version": "0.0.2",
+  "_id": "mysql-sexy-query@0.0.2",
   "optionalDependencies": {},
   "engines": {
     "node": "*"
   },
   "dependencies": {
-    "mysql": ">=0.9.5"
-    ,"mysql-pool": ">= 0.2.2"
+
   },
   "_engineSupported": true,
   "_npmVersion": "1.1.16",
@@ -38,5 +37,5 @@
   "dist": {
     "shasum": "e9efc8ba5ddbd86d6bee151f68399de6"
   },
-  "_from": "mysql-sex-query"
+  "_from": "mysql-sexy-query"
 }

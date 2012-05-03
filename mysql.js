@@ -43,6 +43,8 @@ exports.query = function( table ){
 		return pool.end();
 	};
 
+	this.close = this.end;
+
 	this.destroy = function(){
 		return pool.destroy();
 	};

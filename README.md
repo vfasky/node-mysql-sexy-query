@@ -1,31 +1,31 @@
 友好的sql查询
--------------
+=============
 
-mysql-sex-query 有几个特点：
+mysql-sexy-query 有几个特点：
 
-   1. 支持查询队列( 基于 mysql-queues )
-   2. 支持链操作构造sql语句
-   3. 对查询结果支持绑定
+   1. 基于 mysql-native , 性能强劲
+   2. 默认使用 utf-8 进行连接 ; 解决 mysql-native 中文乱码
+   3. 支持链操作构造sql语句
+   4. 对查询结果支持绑定
 
-使用方法
-    
-    //连接数据库
-    var mysql = require('mysql-sex-query');
+# 连接数据库
+
+    var mysql = require('mysql-sexy-query');
     mysql.createClient({
         user: 'root',
         password: '123456',
         database: 'test'
     });
 
-    //构造sql语句
+# 构造sql语句
     //return SELECT `id`,`name`,`sex` FROM `user` WHERE (( `sex`  =  0 )  OR ( `id`  >  1 ))  LIMIT 10 , 10
     var sql = mysql.use('user').where('sex = ?' , 0)
-                               .orWhere('id > ?' , 1)
+                               .or('id > ?' , 1)
                                .select('id , name , sex')
                                .page(2 , 10)
                                .sql();
 
-    //查询 1 条数据
+# 查询 1 条数据
     mysql.use('user').where('sex = ?' , 0)
                      .select('id , name , sex')
                      .order('id DESC')
@@ -33,7 +33,7 @@ mysql-sex-query 有几个特点：
                         console.log(row)
                      });
 
-    //查询 10 条数据
+# 查询 10 条数据
     mysql.use('user').where('sex = ?' , 0)
                      .select('id , name , sex')
                      .order('id DESC')
@@ -41,12 +41,12 @@ mysql-sex-query 有几个特点：
                         console.log(rows)
                      });
 
-    //统计
+# 统计
     mysql.use('user').where('sex = ?' , 0).count(function(count){
         console.log(count);
     });
 
-    //分页查询
+# 分页查询
     mysql.use('user').where('sex = ?' , 0)
                      .orWhere('id > ?' , 1)
                      .select('id , name , sex')
@@ -66,7 +66,7 @@ mysql-sex-query 有几个特点：
                         console.log(pageInfo);
                      });
 
-    //关联查询
+# 关联查询
     mysql.use('user AS U').join('role_has_user AS RU ON U.id = RU.user_id')
                           .join('role AS R ON R.id = RU.role_id')
                           .select('U.id , U.name , R.name AS role')
@@ -75,7 +75,7 @@ mysql-sex-query 有几个特点：
                             console.log(row);
                           });
 
-    //查询结果绑定
+# 查询结果绑定
     var meta = function(attr){
         for( k in attr )
         {
@@ -85,7 +85,7 @@ mysql-sex-query 有几个特点：
             return this.sex == 1 ? '男' : '女';
         };
     };
-    var ar = new mysql.query('user');
+    var ar = new mysql.Query('user');
     ar.meta = meta;
     ar.get(function(row){
         console.log( row.sexStr() );
@@ -97,7 +97,7 @@ mysql-sex-query 有几个特点：
         console.log( rows );
     });
 
-    //添加数据
+# 添加数据
     mysql.use('user').add({
         'name' : 'test' ,
         'sex' : 1 ,
@@ -107,7 +107,7 @@ mysql-sex-query 有几个特点：
         console.log( id );
     });
 
-    //编辑数据
+# 编辑数据
     mysql.use('user').where('id = ?' , 1)
                      .save({
                         name : 'test2'
@@ -116,16 +116,19 @@ mysql-sex-query 有几个特点：
                         console.log( '更改成功' );
                      });
 
-    //删除数据
+# 删除数据
     mysql.use('user').where('id = ?' , 1)
                      .delete(function(affectedRows){
                         if( affectedRows == 0 ) console.log( '没以数据被删除' );
                         console.log( '删除成功' );
+
+                        //关闭连接
+                        mysql.close();
                      });
 
 
-    //提交查询
-    mysql.execute();
+    
+
 
     
 

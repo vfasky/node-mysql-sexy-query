@@ -375,6 +375,9 @@ exports = module.exports = function( table , undef ){
 		return _self;
 	};
 
+	//orWhere别名
+	this.or = this.orWhere;
+
 	this.page = function(page , pageSize){
 		_page     = page ? Number(page) : 1;
 		_pageSize = pageSize ? Number(pageSize) : 10;
