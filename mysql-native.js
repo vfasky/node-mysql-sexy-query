@@ -69,23 +69,19 @@ exports.Query = function( table ){
 	
 
 	var _self = this;
-	for( k in _attr )
-	{
-		(function(attr){
-			_self[ attr ] = function(){
-				_query[ attr ].apply( null , arguments );
-				return _self;		 
-			};
-		})(_attr[ k ])
-	}
 
-
+	_query.each( _attr , function(v){
+		_self[ v ] = function(){
+			_query[ v ].apply( null , arguments );
+			return _self;		 
+		};
+	} );
 
 	/**
 	 * 元数据绑定
 	 * @type {Boolean}
 	 */
-	this.meta = false;
+	this.Meta = false;
 
 	/**
 	 * 连接数据库
@@ -205,9 +201,9 @@ exports.Query = function( table ){
 		this.connection().query( sql ).on('row', function(result) {
 			if( false == ret ) ret = [];
 
-			if( false != _self.meta )
+			if( false != _self.Meta )
 		    {
-		    	result = new _self.meta(result);
+		    	result = new _self.Meta(result);
 		    }
 
 			ret[ret.length] = result;
@@ -254,9 +250,9 @@ exports.Query = function( table ){
 		var ret = false;
 		
 		this.connection().query( _query.sql() ).on('row', function(result) {
-			if( false != _self.meta )
+			if( false != _self.Meta )
 		    {
-		    	result = new _self.meta(result);
+		    	result = new _self.Meta(result);
 		    }
 			if( number == 1 ) return ret = result;
 			if( false == ret ) ret = [];

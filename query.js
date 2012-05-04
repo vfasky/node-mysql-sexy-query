@@ -119,17 +119,20 @@ exports = module.exports = function( table , undef ){
 	          break ;
 	        default  : return false ;
 	      }
-	}
+	};
+
+	
 
 	this.inArray = function(item , array){
-		for( k in array )
-		{
-			if( item == array[k] )
+		var isIn = false;
+		this.each( array , function( v ){
+			if( item === v )
 			{
-				return true;
+				isIn = true;
+				return false;
 			}
-		}
-		return false;
+		} )
+		return isIn;
 	};
 
 	/**
@@ -204,12 +207,38 @@ exports = module.exports = function( table , undef ){
 	 * @param  {Array}   array   
 	 * @param  {Function} callback [description]
 	 */
+	// this.each = function( array , callback ){
+	// 	if( undef == callback ) return false;
+	// 	//if( false == Array.isArray(array) ) return false;
+	// 	for( k in array )
+	// 	{
+	// 		callback( array[k] , k );
+	// 	}
+	// };
+
 	this.each = function( array , callback ){
 		if( undef == callback ) return false;
-		//if( false == Array.isArray(array) ) return false;
-		for( k in array )
-		{
-			callback( array[k] , k );
+		//console.log(Array.isArray(array));
+		if (Array.isArray(array)) {
+			var count = array.length;
+			for(var i=0; i<count; i++)
+			{
+				var ret = callback( array[i] , i );
+				if( false === ret )
+				{
+					break;
+				}
+			}
+		}
+		else{
+			for( var k in array )
+			{
+				var ret = callback( array[k] , k );
+				if( false === ret )
+				{
+					break;
+				}
+			}
 		}
 	};
 
@@ -221,7 +250,8 @@ exports = module.exports = function( table , undef ){
 	this.trim = function(str)
 	{
 		if (typeof str === 'string') {
-			return str.replace(/(^\s*)|(\s*$)/g, "");
+			return str.trim();
+			//return str.replace(/(^\s*)|(\s*$)/g, "");
 		} 
 	};
 
@@ -291,7 +321,7 @@ exports = module.exports = function( table , undef ){
 	this.add = function(attr){
 		_action = 'INSERT';
 
-		for(k in attr)
+		for(var k in attr)
 		{
 			_param.attr[ _param.attr.length ] = attr[k];
 			_attr[ _attr.length ] = _self.filterColumn(k);
@@ -312,7 +342,7 @@ exports = module.exports = function( table , undef ){
 	this.save = function(attr){
 		_action = 'UPDATE';
 
-		for(k in attr)
+		for(var k in attr)
 		{
 			_param.attr[ _param.attr.length ] = attr[k];
 			_attr[ _attr.length ] = _self.filterColumn(k);

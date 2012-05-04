@@ -9,6 +9,14 @@ mysql.createClient({
     database: '0750hs.net' 
 });
 
+var sql = mysql.use('user').where('sex = ?' , 0)
+                               .or('id > ?' , 1)
+                               .select('id , name , sex')
+                               .page(2 , 10)
+                               .sql();
+
+                               console.log(sql);
+
 // //查询1条
 // mysql.use('degree').get( function(row){
 // 	console.log( row );
@@ -44,8 +52,8 @@ mysql.createClient({
 // });
 
 
-//删除
-mysql.use('degree').where('id = ?' , 7 ).or('id = ?' ,8).delete(function(affectedRows){
-	console.log( affectedRows );
-	mysql.close();
-});
+// //删除
+// mysql.use('degree').where('id = ?' , 7 ).or('id = ?' ,8).delete(function(affectedRows){
+// 	console.log( affectedRows );
+// 	mysql.close();
+// });
