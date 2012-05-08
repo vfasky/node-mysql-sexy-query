@@ -76,8 +76,8 @@ mysql-sexy-query 有几个特点：
                           });
 
 # 查询结果绑定
-    var meta = function(attr){
-        for( k in attr )
+    var Meta = function(attr){
+        for( var k in attr )
         {
             this[ k ] = attr[k];
         }
@@ -86,13 +86,13 @@ mysql-sexy-query 有几个特点：
         };
     };
     var ar = new mysql.Query('user');
-    ar.meta = meta;
+    ar.Meta = Meta;
     ar.get(function(row){
         console.log( row.sexStr() );
     });
 
-    var ar = new mysql.query('user');
-    ar.meta = meta;
+    var ar = new mysql.Query('user');
+    ar.Meta = Meta;
     ar.get( 10 , function(rows){
         console.log( rows );
     });
