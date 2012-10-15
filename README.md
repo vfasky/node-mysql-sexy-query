@@ -70,6 +70,23 @@ User.as('U').join(Role.as('R') , '@.role_id = R.id')
     .page(1,10)
     .execute (rows) ->
         console.log rows
+
+# 添加数据
+User.add(
+    name : 'test' ,
+    sex : 1 
+).execute (ret) ->
+    console.log ret
+
+# 编辑数据
+User.find('id = ?', 1).save(
+    name : 'test2'
+).execute (ret) ->
+    console.log ret
+
+# 删除数据
+User.find('id = ?', 1).remove().execute (ret) ->
+    console.log ret
     
 ```
 
