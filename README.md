@@ -72,3 +72,8 @@ User.as('U').join(Role.as('R') , '@.role_id = R.id')
         console.log rows
     
 ```
+
+### 安装方法
+```
+npm install git@github.com:vfasky/node-mysql-sexy-query.git
+```
