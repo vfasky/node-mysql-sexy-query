@@ -37,7 +37,7 @@ class Role extends mysql
     connection : connection
     
 # 查询 id 为 1 的用户
-User.find('id = ?' , 1).execute rows ->
+User.find('id = ?' , 1).execute (rows) ->
     console.log rows
     
 # 'order' and 'get'
