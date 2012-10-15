@@ -61,11 +61,14 @@ ar.execute (rows) ->
 ar.get_pagination (pagination) ->
     console.log pagination 
     
-# 关联查询 join
-User.as('U').join(Role.as('R) , '@.role_id = R.id')
-       .select('@.id , @.name , R.name AS role)
-       .page(1,10)
-       .execute (rows) ->
-           console.log rows
+### 
+关联查询 join
+注： 这里 `@` 代表 User 表 
+###
+User.as('U').join(Role.as('R‘) , '@.role_id = R.id')
+    .select('@.id , @.name , R.name AS role)
+    .page(1,10)
+    .execute (rows) ->
+        console.log rows
     
 ```
