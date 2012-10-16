@@ -1,3 +1,5 @@
+Wind = require 'wind'
+Task = Wind.Async.Task
 
 class Query
 
@@ -71,8 +73,25 @@ class Query
             'GROUP' , 'HAVING' , 'LIMIT' , 'OFFSET' ,
         ]
 
-    execute : (callback)->
+    execute : (callback) ->
         @adapter(@to_sql(), @_args, callback)
+
+    execute_async : ->
+        Wind.Async.Binding.fromCallback @execute
+        # sql     = @to_sql()
+        # args    = @_args
+        # adapter = @adapter
+
+        # Task.create (t) ->
+        #     adapter(sql, args, (ret, err)->
+        #         console.log ret 
+        #         if err
+        #             t.complete("failure", err)
+        #         else
+        #             t.complete("success", ret)
+        #     )
+
+
 
     as : (as) ->
         @_as = as.trim()

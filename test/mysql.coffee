@@ -46,14 +46,18 @@ class Role extends mysql
 # ).execute (rows) -> 
 #     console.log rows
 
+Wind = require 'wind'
 
-User.find('@.id = ?' , 28).as('U')
-    .join(Role.as('R') , '@.role_id = R.id')
-    .select('@.id , @.name , R.name as role_name')
-    .page(1,3)
-    .get_pagination (page_info) ->
-        console.log page_info
- 
+
+user = User.find('id = ?' , 28)
+
+eval(Wind.compile("async", ->
+  data = $await(user.execute_async())
+  console.log data
+))
+
+
+ # console.log data
 
 # for i in [1,2,3,4,5,6,7,8,9,10,11,12,13]
 #     User.add(
