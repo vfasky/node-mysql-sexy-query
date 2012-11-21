@@ -29,7 +29,7 @@ class maria_pool extends Query
                 user: cfg.user,
                 password: cfg.password,
                 port:cfg.port,
-                database:cfg.database
+                db:cfg.database
 
             });
             c.on('connect', () ->

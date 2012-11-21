@@ -49,7 +49,7 @@
             user: cfg.user,
             password: cfg.password,
             port: cfg.port,
-            database: cfg.database
+            db: cfg.database
           });
           return c.on('connect', function() {
             console.log('Client connected');
