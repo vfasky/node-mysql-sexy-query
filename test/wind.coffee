@@ -1,5 +1,5 @@
 mysql = require('../index').mysql_native
-Wind  = require 'wind'
+
 
 connection = mysql.create_connection({
   host     : 'localhost',
@@ -19,11 +19,5 @@ class Role extends mysql
     connection : connection
 
 
-user = User.find('id != ?' , 1)
 
-ret = eval(Wind.compile("async", ->
-  $await user.execute_async()
-))
-
-console.log ret
 
