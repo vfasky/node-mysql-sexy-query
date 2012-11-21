@@ -72,7 +72,9 @@
     };
 
     maria_pool.prototype.adapter = function(sql, args, callback) {
+      var c;
       if (this.connection) {
+        c = this.connection;
         return this.connection.acquire(function(err, client) {
           var db, result;
           if (err) {
@@ -93,7 +95,7 @@
             });
             return db.on('end', function() {
               console.log('Done with all results');
-              return this.connection.release(client);
+              return c.release(client);
             });
           }
         });
