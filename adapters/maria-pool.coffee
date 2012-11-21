@@ -77,7 +77,10 @@ class maria_pool extends Query
                         )
                         .on('end', (info) ->
                             console.log 'Result finished successfully'
-                            callback(null,result);
+                            if(result.length==1)
+                                callback(null,result[0])
+                            else
+                                callback(null,result);
                         )
                     )
                     db.on('end', () ->

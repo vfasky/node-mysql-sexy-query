@@ -92,7 +92,11 @@
                 return console.log('Result error: ' + err);
               }).on('end', function(info) {
                 console.log('Result finished successfully');
-                return callback(null, result);
+                if (result.length === 1) {
+                  return callback(null, result[0]);
+                } else {
+                  return callback(null, result);
+                }
               });
             });
             return db.on('end', function() {
