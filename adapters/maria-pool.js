@@ -55,10 +55,10 @@
           });
           return c.on('connect', function() {
             console.log('Client connected');
-            return callback(null, c);
+            return callback(c, null);
           }).on('error', function(err) {
             console.log('Client error: ' + err);
-            return callback(err, null);
+            return callback(null, err);
           }).on('close', function(hadError) {
             return console.log('Client closed');
           });
@@ -80,27 +80,24 @@
         return this.connection.acquire(function(err, client) {
           var db, result;
           if (err) {
-            return callback(err, null);
+            return callback(null, err);
           } else {
             result = [];
             db = client.query(sql, args);
             db.on('result', function(res) {
               return res.on('row', function(row) {
-                console.log('Result row: ' + row);
                 return result.push(row);
               }).on('error', function(err) {
-                return console.log('Result error: ' + err);
+                return callback(err, null);
               }).on('end', function(info) {
-                console.log('Result finished successfully');
                 if (result.length === 1) {
-                  return callback(null, result[0]);
+                  return callback(result[0], null);
                 } else {
-                  return callback(null, result);
+                  return callback(result, null);
                 }
               });
             });
             return db.on('end', function() {
-              console.log('Done with all results');
               return c.release(client);
             });
           }

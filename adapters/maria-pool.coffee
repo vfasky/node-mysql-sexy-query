@@ -36,11 +36,11 @@ class maria_pool extends Query
             });
             c.on('connect', () ->
                     console.log 'Client connected'
-                    callback(null,c)
+                    callback(c,null)
                 )
             .on('error', (err) ->
                     console.log 'Client error: ' + err
-                    callback(err,null)
+                    callback(null,err)
                 )
             .on('close', (hadError) -> 
                 console.log 'Client closed'
@@ -63,28 +63,25 @@ class maria_pool extends Query
             c=@connection
             @connection.acquire (err, client) ->
                 if (err) 
-                    callback err,null  
+                    callback null,err  
                 else
                     result=[]
                     db=client.query sql, args
                     db.on('result', (res) -> 
-                        res.on('row', (row) ->
-                            console.log 'Result row: ' + row
+                        res.on('row', (row) -> 
                             result.push row
                         )
                         .on('error', (err) ->
-                            console.log 'Result error: ' + err
+                            callback(err,null);
                         )
-                        .on('end', (info) ->
-                            console.log 'Result finished successfully'
+                        .on('end', (info) ->    
                             if(result.length==1)
-                                callback(null,result[0])
+                                callback(result[0],null)
                             else
-                                callback(null,result);
+                                callback(result,null);
                         )
                     )
-                    db.on('end', () ->
-                        console.log 'Done with all results'
+                    db.on('end', () -> 
                         c.release client
                     );
               
