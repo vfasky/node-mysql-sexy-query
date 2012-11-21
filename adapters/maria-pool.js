@@ -74,12 +74,13 @@
     maria_pool.prototype.adapter = function(sql, args, callback) {
       if (!this.connection) {
         return this.connection.acquire(function(err, client) {
-          var result;
+          var db, result;
           if (err) {
             return callback(err, null);
           } else {
             result = [];
-            return client.query(sql(args.on('result', function(res) {
+            db = client.query(sql, args);
+            db.on('result', function(res) {
               return res.on('row', function(row) {
                 console.log('Result row: ' + inspect(row));
                 return result.push(row);
@@ -89,10 +90,11 @@
                 console.log('Result finished successfully');
                 return callback(null, result);
               });
-            }).on('end', function() {
+            });
+            return db.on('end', function() {
               console.log('Done with all results');
               return pool.release(client);
-            })));
+            });
           }
         });
       }

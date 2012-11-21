@@ -63,21 +63,21 @@ class maria_pool extends Query
                     callback err,null  
                 else
                     result=[]
-                    client.query sql args
-                    .on('result', (res) -> 
-                            res.on('row', (row) ->
-                                console.log 'Result row: ' + inspect(row)
-                                result.push row
-                            )
-                            .on('error', (err) ->
-                                console.log 'Result error: ' + inspect(err)
-                            )
-                            .on('end', (info) ->
-                                console.log 'Result finished successfully'
-                                callback(null,result);
-                            )
+                    db=client.query sql, args
+                    db.on('result', (res) -> 
+                        res.on('row', (row) ->
+                            console.log 'Result row: ' + inspect(row)
+                            result.push row
+                        )
+                        .on('error', (err) ->
+                            console.log 'Result error: ' + inspect(err)
+                        )
+                        .on('end', (info) ->
+                            console.log 'Result finished successfully'
+                            callback(null,result);
+                        )
                     )
-                    .on('end', () ->
+                    db.on('end', () ->
                         console.log 'Done with all results'
                         pool.release client
                     );
