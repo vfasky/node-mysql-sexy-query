@@ -26,7 +26,10 @@
     "node": "*"
   },
   "dependencies": {
-
+    "mysql-native":"*",
+    "mariasql":"*",
+    "mysql":"*",
+    "generic-pool":"*"
   },
   "_engineSupported": true,
   "_npmVersion": "1.1.16",
