@@ -25,10 +25,10 @@
       return maria_pool.__super__.constructor.apply(this, arguments);
     }
 
-    maria_pool.prototype.connection = false;
+    maria_pool.connection = false;
 
     maria_pool.create_connection = function(cfg) {
-      var pool;
+      var connection;
       if (cfg == null) {
         cfg = {
           host: '127.0.0.1',
@@ -39,7 +39,7 @@
           client: 'TCP'
         };
       }
-      return pool = poolModule.Pool({
+      return connection = poolModule.Pool({
         name: 'maria',
         create: function(callback) {
           var c;
@@ -47,7 +47,9 @@
           c.connect({
             host: cfg.host,
             user: cfg.user,
-            password: cfg.password
+            password: cfg.password,
+            port: cfg.port,
+            database: cfg.database
           });
           return c.on('connect', function() {
             console.log('Client connected');
@@ -70,24 +72,30 @@
     };
 
     maria_pool.prototype.adapter = function(sql, args, callback) {
-      return pool.acquire(function(err, client) {
-        if (err) {
-          return console.log(err);
-        } else {
-          return client.query(sql.on('result', function(res) {
-            return res.on('row', function(row) {
-              return console.log('Result row: ' + inspect(row));
-            }).on('error', function(err) {
-              return console.log('Result error: ' + inspect(err));
-            }).on('end', function(info) {
-              return console.log('Result finished successfully');
-            });
-          }).on('end', function() {
-            console.log('Done with all results');
-            return pool.release(client);
-          }));
-        }
-      });
+      if (!this.connection) {
+        return this.connection.acquire(function(err, client) {
+          var result;
+          if (err) {
+            return callback(err, null);
+          } else {
+            result = [];
+            return client.query(sql(args.on('result', function(res) {
+              return res.on('row', function(row) {
+                console.log('Result row: ' + inspect(row));
+                return result.push(row);
+              }).on('error', function(err) {
+                return console.log('Result error: ' + inspect(err));
+              }).on('end', function(info) {
+                console.log('Result finished successfully');
+                return callback(null, result);
+              });
+            }).on('end', function() {
+              console.log('Done with all results');
+              return pool.release(client);
+            })));
+          }
+        });
+      }
     };
 
     return maria_pool;

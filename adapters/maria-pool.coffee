@@ -9,7 +9,7 @@ maria-pool 适配合器
 
 class maria_pool extends Query
 
-    connection : false
+    @connection : false
 
     @create_connection : (cfg  = {
         host     : '127.0.0.1', 
@@ -19,14 +19,18 @@ class maria_pool extends Query
         port     : 3306 ,
         client   : 'TCP'
     }) ->
-        pool = poolModule.Pool({
+
+        connection = poolModule.Pool({
         name:'maria',
         create:(callback) ->
             c =new Client()
             c.connect({
                 host: cfg.host,
                 user: cfg.user,
-                password: cfg.password
+                password: cfg.password,
+                port:cfg.port,
+                database:cfg.database
+
             });
             c.on('connect', () ->
                     console.log 'Client connected'
@@ -46,30 +50,36 @@ class maria_pool extends Query
         min:2,   
         idleTimeoutMillis:30000,
         log : true 
-        });
+        })
+      
+     
 
 
     # 适配器
     adapter : (sql, args, callback) ->
-        pool.acquire (err, client) ->
-            if (err) 
-                console.log err   
-            else
-                client.query sql
-                .on('result', (res) -> 
-                        res.on('row', (row) ->
-                            console.log 'Result row: ' + inspect(row)
-                        )
-                        .on('error', (err) ->
-                            console.log 'Result error: ' + inspect(err)
-                        )
-                        .on('end', (info) ->
-                            console.log 'Result finished successfully'
-                        )
-                )
-                .on('end', () ->
-                    console.log 'Done with all results'
-                    pool.release client
-                );
+        if (!@connection)
+            @connection.acquire (err, client) ->
+                if (err) 
+                    callback err,null  
+                else
+                    result=[]
+                    client.query sql args
+                    .on('result', (res) -> 
+                            res.on('row', (row) ->
+                                console.log 'Result row: ' + inspect(row)
+                                result.push row
+                            )
+                            .on('error', (err) ->
+                                console.log 'Result error: ' + inspect(err)
+                            )
+                            .on('end', (info) ->
+                                console.log 'Result finished successfully'
+                                callback(null,result);
+                            )
+                    )
+                    .on('end', () ->
+                        console.log 'Done with all results'
+                        pool.release client
+                    );
               
 exports = module.exports = maria_pool  
