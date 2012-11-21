@@ -77,7 +77,7 @@
       var c;
       if (this.connection) {
         c = this.connection;
-        return this.connection.acquire(function(err, client) {
+        return this.connection.acquire(function(client, err) {
           var db, result;
           if (err) {
             return callback(null, err);
@@ -88,7 +88,7 @@
               return res.on('row', function(row) {
                 return result.push(row);
               }).on('error', function(err) {
-                return callback(err, null);
+                return callback(null, err);
               }).on('end', function(info) {
                 if (result.length === 1) {
                   return callback(result[0], null);

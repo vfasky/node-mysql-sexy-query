@@ -61,7 +61,7 @@ class maria_pool extends Query
     adapter : (sql, args, callback) ->
         if (@connection)
             c=@connection
-            @connection.acquire (err, client) ->
+            @connection.acquire ( client,err) ->
                 if (err) 
                     callback null,err  
                 else
@@ -72,7 +72,7 @@ class maria_pool extends Query
                             result.push row
                         )
                         .on('error', (err) ->
-                            callback(err,null);
+                            callback(null,err);
                         )
                         .on('end', (info) ->    
                             if(result.length==1)
