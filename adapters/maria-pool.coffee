@@ -57,7 +57,7 @@ class maria_pool extends Query
 
     # 适配器
     adapter : (sql, args, callback) ->
-        if (!@connection)
+        if (@connection)
             @connection.acquire (err, client) ->
                 if (err) 
                     callback err,null  
@@ -66,11 +66,11 @@ class maria_pool extends Query
                     db=client.query sql, args
                     db.on('result', (res) -> 
                         res.on('row', (row) ->
-                            console.log 'Result row: ' + inspect(row)
+                            console.log 'Result row: ' + row
                             result.push row
                         )
                         .on('error', (err) ->
-                            console.log 'Result error: ' + inspect(err)
+                            console.log 'Result error: ' + err
                         )
                         .on('end', (info) ->
                             console.log 'Result finished successfully'
@@ -79,7 +79,7 @@ class maria_pool extends Query
                     )
                     db.on('end', () ->
                         console.log 'Done with all results'
-                        pool.release client
+                        @connection.release client
                     );
               
 exports = module.exports = maria_pool  
