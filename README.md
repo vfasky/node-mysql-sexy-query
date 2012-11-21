@@ -9,7 +9,7 @@ mysql-sexy-query
  * 降偶，使用`适配器`的方式与驱动连接
    * 支持 [node-mysql](https://github.com/felixge/node-mysql)
    * 支持 [mysql-native](https://github.com/sidorares/nodejs-mysql-native)
-   * 支持 [mariasql](https://github.com/mscdex/node-mariasql) 感谢 [Casear](https://github.com/mscdex/node-mariasql) 贡献
+   * 支持 [mariasql](https://github.com/mscdex/node-mariasql) 感谢 [Casear](https://github.com/Casear) 贡献
    
    
 ### DEMO ：
