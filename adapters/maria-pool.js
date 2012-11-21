@@ -54,14 +54,11 @@
             db: cfg.database
           });
           return c.on('connect', function() {
-            console.log('Client connected');
             return callback(null, c);
           }).on('error', function(err) {
             console.log('Client error: ' + err);
             return callback(err, null);
-          }).on('close', function(hadError) {
-            return console.log('Client closed');
-          });
+          }).on('close', function(hadError) {});
         },
         destroy: function(client) {
           return client.end();

@@ -35,7 +35,6 @@ class maria_pool extends Query
 
             });
             c.on('connect', () ->
-                    console.log 'Client connected'
                     callback(null,c)
                 )
             .on('error', (err) ->
@@ -43,7 +42,7 @@ class maria_pool extends Query
                     callback(err,null)
                 )
             .on('close', (hadError) -> 
-                console.log 'Client closed'
+               
                 );
         ,
         destroy: (client) ->
