@@ -39,7 +39,7 @@
           client: 'TCP'
         };
       }
-      return connection = poolModule.Pool({
+      return connection = PoolModule.Pool({
         name: 'maria',
         create: function(callback) {
           var c;

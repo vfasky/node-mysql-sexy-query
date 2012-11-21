@@ -20,7 +20,7 @@ class maria_pool extends Query
         client   : 'TCP'
     }) ->
 
-        connection = poolModule.Pool({
+        connection = PoolModule.Pool({
         name:'maria',
         create:(callback) ->
             c =new Client()
