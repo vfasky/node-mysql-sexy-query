@@ -36,7 +36,9 @@
           password: '',
           database: 'test',
           port: 3306,
-          client: 'TCP'
+          log: true,
+          maxPool: 100,
+          minPool: 10
         };
       }
       return connection = PoolModule.Pool({
@@ -64,10 +66,10 @@
         destroy: function(client) {
           return client.end();
         },
-        max: 10,
-        min: 2,
+        max: cfg.maxPool,
+        min: cfg.minPool,
         idleTimeoutMillis: 30000,
-        log: true
+        log: cfg.log
       });
     };
 

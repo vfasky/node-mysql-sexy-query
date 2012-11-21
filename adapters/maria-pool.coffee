@@ -17,7 +17,9 @@ class maria_pool extends Query
         password : '' ,
         database : 'test' ,
         port     : 3306 ,
-        client   : 'TCP'
+        log      : true,
+        maxPool  : 100,
+        minPool  : 10
     }) ->
 
         connection = PoolModule.Pool({
@@ -46,10 +48,10 @@ class maria_pool extends Query
         ,
         destroy: (client) ->
                     client.end() 
-        max:10,
-        min:2,   
+        max:cfg.maxPool,
+        min:cfg.minPool,   
         idleTimeoutMillis:30000,
-        log : true 
+        log : cfg.log 
         })
       
      
