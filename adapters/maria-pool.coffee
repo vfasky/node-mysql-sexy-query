@@ -75,10 +75,7 @@ class maria_pool extends Query
                             callback(null,err);
                         )
                         .on('end', (info) ->    
-                            if(result.length==1)
-                                callback(result[0],null)
-                            else
-                                callback(result,null);
+                            callback(result,null);
                         )
                     )
                     db.on('end', () -> 

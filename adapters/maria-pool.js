@@ -90,11 +90,7 @@
               }).on('error', function(err) {
                 return callback(null, err);
               }).on('end', function(info) {
-                if (result.length === 1) {
-                  return callback(result[0], null);
-                } else {
-                  return callback(result, null);
-                }
+                return callback(result, null);
               });
             });
             return db.on('end', function() {
