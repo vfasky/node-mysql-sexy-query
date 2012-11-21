@@ -36,11 +36,11 @@ class maria_pool extends Query
             });
             c.on('connect', () ->
                     console.log 'Client connected'
-                    callback(c,null)
+                    callback(null,c)
                 )
             .on('error', (err) ->
                     console.log 'Client error: ' + err
-                    callback(null,err)
+                    callback(err,null)
                 )
             .on('close', (hadError) -> 
                 console.log 'Client closed'
@@ -61,7 +61,7 @@ class maria_pool extends Query
     adapter : (sql, args, callback) ->
         if (@connection)
             c=@connection
-            @connection.acquire ( client,err) ->
+            @connection.acquire ( err,client) ->
                 if (err) 
                     callback null,err  
                 else

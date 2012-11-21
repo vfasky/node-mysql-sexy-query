@@ -55,10 +55,10 @@
           });
           return c.on('connect', function() {
             console.log('Client connected');
-            return callback(c, null);
+            return callback(null, c);
           }).on('error', function(err) {
             console.log('Client error: ' + err);
-            return callback(null, err);
+            return callback(err, null);
           }).on('close', function(hadError) {
             return console.log('Client closed');
           });
@@ -77,7 +77,7 @@
       var c;
       if (this.connection) {
         c = this.connection;
-        return this.connection.acquire(function(client, err) {
+        return this.connection.acquire(function(err, client) {
           var db, result;
           if (err) {
             return callback(null, err);
