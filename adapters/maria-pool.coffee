@@ -9,7 +9,7 @@ maria-pool 适配合器
 
 class maria_pool extends Query
 
-    @connection : false
+    connection : false
 
     @create_connection : (cfg  = {
         host     : '127.0.0.1', 

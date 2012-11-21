@@ -25,7 +25,7 @@
       return maria_pool.__super__.constructor.apply(this, arguments);
     }
 
-    maria_pool.connection = false;
+    maria_pool.prototype.connection = false;
 
     maria_pool.create_connection = function(cfg) {
       var connection;
